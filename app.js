@@ -8,6 +8,7 @@ const errorHandler = require('./middlewares/errorHandler');
 const notFound = require('./middlewares/notFound');
 
 app.use(cors());
+app.use(express.json());
 app.use(logger('dev'));
 
 app.use('/', router);
