@@ -1,18 +1,11 @@
-var MongoClient = require('mongodb').MongoClient
+const Connection = require('../modules/mongoClass');
+const { ObjectId } = require('mongodb');
 const MainResponse = require('../modules/MainResponse');
 const response = new MainResponse();
 
-//ilk sorulara yanıt not deleted ile gelmiyor, async ile db sorgusunu sıraya almam gerek yoksa sorgu tamamlanmadan dönüş yapıyor
-
 async function getter(req, res) {
-    MongoClient.connect('mongodb://localhost:27017', { useUnifiedTopology: true }, function (err, client) {
-        if (err) throw err
-        var db = client.db('yepyenidb')
-        db.collection(req.params.coll).find().toArray(function (err, result) {
-            if (err) throw err;
-            if (result.length > 0) response.setResponse(true, "OK", result)
-        });
-    });
+    var connect = await new Connection('sample-api', req.params.coll).find();
+    if (connect.length > 0) response.setResponse(true, "OK", connect);
     return res.json(response.getResponse());
 };
 module.exports = getter;  

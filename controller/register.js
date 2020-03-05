@@ -1,19 +1,25 @@
-var MongoClient = require('mongodb').MongoClient
+const Connection = require('../modules/mongoClass');
 const MainResponse = require('../modules/MainResponse');
 const response = new MainResponse();
 
-//ilk sorulara yanıt not deleted ile gelmiyor, async ile db sorgusunu sıraya almam gerek yoksa sorgu tamamlanmadan dönüş yapıyor
-
-async function inserter(req, res) {
-    MongoClient.connect('mongodb://localhost:27017', { useUnifiedTopology: true }, function (err, client) {
-        if (err) throw err
-        var db = client.db('yepyenidb')
-        db.collection(req.params.coll).insertOne(req.body, function (err, result) {
-            if (err) throw err;
-            client.close();
-            if (result.insertedCount > 0) response.setResponse(true, result.ops)
-        });
-    });
+async function register(req, res) {
+    const newUser = {
+        email: req.body.email,
+        password:  req.body.password, 
+        name: req.body.name,
+        reqTime: req.timestamp
+    }
+    var emailExist = await new Connection('sample-api','users').find({email: req.body.email});
+    if (emailExist.length >= 1) {
+        response.setResponse(false, "Email is existing.");
+    } else {
+        const connect = await new Connection('sample-api', 'users').insertOne(newUser);
+        if (connect.insertedCount > 0) {
+            response.setResponse(true, "Register Success");
+        } else {
+            response.setResponse(false, "Can't register now!");
+        }
+    }
     return res.json(response.getResponse());
 };
-module.exports = inserter;
+module.exports = register;
