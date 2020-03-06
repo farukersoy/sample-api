@@ -7,7 +7,11 @@ async function register(req, res) {
         email: req.body.email,
         password:  req.body.password, 
         name: req.body.name,
-        reqTime: req.timestamp
+        mobile: req.body.mobile,
+        birthdate: req.body.birthdate,
+        permType: 1,
+        status: true,
+        registerTime: req.timestamp
     }
     var emailExist = await new Connection('sample-api','users').find({email: req.body.email});
     if (emailExist.length >= 1) {
